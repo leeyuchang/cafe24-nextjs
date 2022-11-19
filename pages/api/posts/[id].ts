@@ -13,7 +13,7 @@ export default async function read(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === "GET") {
     try {
-      const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+      const post = await prisma.post.findUnique({ where: { id } });
       if (!post) {
         return res.status(404).end();
       }
