@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Req } from ".";
-
-const prisma = new PrismaClient();
+import prisma from "../../../db";
 
 export default async function read(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as unknown as { id: number };
