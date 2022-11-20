@@ -23,3 +23,9 @@ model Tag {
   postId  Int?
   content String?
 }
+
+model User {
+  id             Int    @id @default(autoincrement())
+  username       String @unique
+  hashedPassword String
+}
