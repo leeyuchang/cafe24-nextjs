@@ -1,8 +1,6 @@
 import { Tag } from ".prisma/client";
-import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../db";
 
 export type Req = {
   title: string;
