@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Req } from ".";
-import { prisma } from "../../../db";
+import prisma from "../../../db";
 
 export default async function read(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as unknown as { id: number };
