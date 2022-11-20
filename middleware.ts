@@ -2,11 +2,6 @@ import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { CustomRequest } from "./pages/api/auth/login";
 
-// interface Payload extends ModifiedRequest {
-//   userId: number;
-//   userName: string;
-// }
-
 // Enable theme
 // ...
 /**
