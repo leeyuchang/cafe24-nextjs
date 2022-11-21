@@ -1,6 +1,7 @@
 import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { CustomRequest } from "./pages/api/auth/login";
+import { Token } from "./utils";
 
 // Enable theme
 // ...
@@ -14,14 +15,22 @@ export async function middleware(request: NextRequest) {
   if (!token) return NextResponse.next();
 
   try {
-    if (!process.env.JWT_SECRET) throw Error("NotFound JWT_SECRET");
+    const { JWT_SECRET } = process.env;
+
+    if (!JWT_SECRET) throw Error("NotFound JWT_SECRET");
     const { payload } = await jose.jwtVerify(
       token,
-      new TextEncoder().encode(process.env.JWT_SECRET)
+      new TextEncoder().encode(JWT_SECRET)
     );
 
     const userId = payload.userId as number;
     const userName = payload.userName as string;
+
+    const now = Math.floor(Date.now() / 1_000);
+    let newToken = null;
+    if (payload.exp! - now < 60 * 60 * 24 * 3.5) {
+      newToken = await Token.generate({ userId, userName });
+    }
 
     return NextResponse.next({
       request: { ...request, ...{ state: { userId, userName } } },

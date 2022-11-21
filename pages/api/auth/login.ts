@@ -7,12 +7,14 @@ import { Token } from "../../../utils";
 const prisma = new PrismaClient();
 
 export interface CustomRequest extends NextApiRequest {
-  userId: number;
-  userName: string;
+  state: {
+    userId: number;
+    userName: string;
+  };
 }
 
 export default async function login(req: CustomRequest, res: NextApiResponse) {
-  console.log("중요 합니다. ===> ", req);
+  console.log("===> req ", req);
 
   if (req.method === "POST") {
     const { username, password } = req.body;
