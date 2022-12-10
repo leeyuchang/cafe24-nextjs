@@ -1,6 +1,5 @@
 import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
-import { CustomRequest } from "./pages/api/auth/login";
 import { Token } from "./utils";
 
 // Enable theme
@@ -11,6 +10,7 @@ import { Token } from "./utils";
  * @returns
  */
 export async function middleware(request: NextRequest) {
+
   const token = request.cookies.get("access_token");
   if (!token) return NextResponse.next();
 
