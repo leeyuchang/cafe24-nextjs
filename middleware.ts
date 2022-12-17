@@ -2,6 +2,10 @@ import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { Token } from "./utils";
 
+const isExpired = (date: string) => {
+  return Date.now() > JSON.parse(date).expiredAt;
+};
+
 // Enable theme
 // ...
 /**
@@ -10,33 +14,59 @@ import { Token } from "./utils";
  * @returns
  */
 export async function middleware(request: NextRequest) {
+  // const currentUser = request.cookies.get("currentUser")?.valueOf();
 
-  const token = request.cookies.get("access_token");
-  if (!token) return NextResponse.next();
+  // const { pathname } = request.nextUrl;
+
+  // if (["/loging"].includes(pathname) && (!currentUser || isExpired(""))) {
+  //   request.cookies.get("currentUser");
+  //   const response = NextResponse.rewrite(new URL("/login", request.url));
+  //   response.cookies.delete("currentUser");
+  //   return response;
+  // }
+
+  // if (["/profile"].includes(pathname) && currentUser) {
+  //   const response = NextResponse.rewrite(new URL("/profile", request.url));
+  //   return response;
+  // }
+
+  const token = String(request.cookies.get("access_token")).valueOf();
+  // console.log("===> token ", token);
+
+  // if (!token) return NextResponse.next();
+
+  // console.log("===> passed ");
 
   try {
-    const { JWT_SECRET } = process.env;
+    // const { JWT_SECRET } = process.env;
 
-    if (!JWT_SECRET) throw Error("NotFound JWT_SECRET");
-    const { payload } = await jose.jwtVerify(
-      token,
-      new TextEncoder().encode(JWT_SECRET)
-    );
+    // if (!JWT_SECRET) throw Error("NotFound JWT_SECRET");
+    // const { payload } = await jose.jwtVerify(
+    //   token,
+    //   new TextEncoder().encode(JWT_SECRET)
+    // );
 
-    const userId = payload.userId as number;
-    const userName = payload.userName as string;
+    // const userId = payload.userId as number;
+    // const userName = payload.userName as string;
 
-    const now = Math.floor(Date.now() / 1_000);
-    let newToken = null;
-    if (payload.exp! - now < 60 * 60 * 24 * 3.5) {
-      newToken = await Token.generate({ userId, userName });
-    }
+    // const now = Math.floor(Date.now() / 1_000);
+    // let newToken = null;
+    // if (payload.exp! - now < 60 * 60 * 24 * 3.5) {
+    //   newToken = await Token.generate({ userId, userName });
+    // }
+
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("session", "hello world");
 
     return NextResponse.next({
-      request: { ...request, ...{ state: { userId, userName } } },
+      request: {
+        headers: requestHeaders,
+      },
     });
   } catch (error) {
-    return NextResponse.redirect("/login");
+    console.log("===> error ", error);
+
+    return NextResponse.rewrite(new URL("/login", request.url));
   }
 }
 
@@ -44,6 +74,6 @@ export async function middleware(request: NextRequest) {
  * 미들웨어 적용방법
  * 아래와 같이 config로 지정한다.
  */
-export const config = {
-  matcher: "/api/:path*",
-};
+// export const config = {
+//   matcher: "/api/:path*",
+// };
