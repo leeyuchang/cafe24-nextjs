@@ -1,20 +1,24 @@
+import {
+  DehydratedState,
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import type { AppProps } from "next/app";
-import { useEffect, useState } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { TouchBackend } from "react-dnd-touch-backend";
+import { useState } from "react";
 import "../styles/globals.css";
 
-export default function App({ Component, pageProps }: AppProps) {
-  const [isMobile, setIsMoble] = useState(false);
-
-  useEffect(() => {
-    setIsMoble(window.innerWidth < 600);
-  }, []);
+export default function App({
+  Component,
+  pageProps,
+}: AppProps<{ dehydratedState: DehydratedState }>) {
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-      <Component {...pageProps} />
-    </DndProvider>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <Component {...pageProps} />
+      </Hydrate>
+    </QueryClientProvider>
   );
 }
