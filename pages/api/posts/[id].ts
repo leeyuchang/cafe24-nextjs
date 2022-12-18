@@ -1,3 +1,4 @@
+import { NotFoundError } from "@prisma/client/runtime";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Req } from ".";
 import prisma from "../../../db";
@@ -11,12 +12,12 @@ export default async function read(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === "GET") {
     try {
-      const post = await prisma.post.findUnique({ where: { id } });
-      if (!post) {
-        return res.status(404).end();
-      }
+      const post = await prisma.post.findUniqueOrThrow({ where: { id } });
       return res.status(200).send(post);
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        return res.status(404).end();
+      }
       return res.status(500).end();
     }
   }

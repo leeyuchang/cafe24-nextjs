@@ -1,5 +1,9 @@
 import * as jose from "jose";
 
+type CheckPassword = {
+  password: string;
+  hashedPassword: string;
+};
 export default class Token {
   // constructor() {}
 
@@ -10,12 +14,10 @@ export default class Token {
     userId: number;
     userName: string;
   }) {
-    const jwtToken = await new jose.SignJWT({ userId, userName })
-      .setProtectedHeader({ alg: "HS256" })
+    return await new jose.SignJWT({ userId, userName })
+      .setProtectedHeader({ typ: "JWT", alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime("1d")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET));
-
-    return jwtToken;
   }
 }

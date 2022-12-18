@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { NotFoundError } from "@prisma/client/runtime";
 import Joi from "joi";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -24,8 +23,6 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 
     try {
       const exists = await prisma.user.findFirst({ where: { username } });
-
-      NotFoundError;
 
       // 중복 있다면
       if (exists) return res.status(409).end();

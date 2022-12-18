@@ -6,26 +6,38 @@ export type Req = {
   title: string;
   body: string;
   tags: string[];
+  userId: number;
 };
 
 const index = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const { title, body, tags } = req.body as Req;
+    const state = JSON.parse(String(req.headers.state).valueOf());
+    console.log("===> state ", state);
+
+    // const { user }: any = JSON.parse();
 
     try {
-      await prisma.post.create({
+      const newPost = await prisma.post.create({
         data: {
           title,
           body,
           tags: {
             create: tags.map((tag) => ({ content: tag } as Tag)),
           },
+          userId: state.user.userId,
         },
       });
-    } catch (error) {
+
+      const found = prisma.post.findUnique({
+        where: { id: newPost.id },
+        include: { tags: true, user: true },
+      });
+
+      return res.status(201).send(found);
+    } catch {
       res.status(500);
     }
-    res.status(200).send({ msg: "hello" });
   }
 
   if (req.method === "GET") {
