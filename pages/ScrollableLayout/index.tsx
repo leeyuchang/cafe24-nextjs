@@ -1,14 +1,14 @@
-import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import { useInnerHeight } from "../../hooks";
+import { dehydrate, QueryClient } from '@tanstack/react-query';
+import { NextPage } from 'next';
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { useInnerHeight } from '../../hooks';
 
 const ScrollableLayout: NextPage = () => {
   const { innerHeight } = useInnerHeight();
 
-  const [array1, setArray1] = useState([...Array(10)]);
-  const [array2, setArray2] = useState([...Array(10)]);
+  const [array1, setArray1] = useState([...Array(100)]);
+  const [array2, setArray2] = useState([...Array(100)]);
 
   const { ref: ref1, inView: inView1 } = useInView({ threshold: 0 });
   const { ref: ref2, inView: inView2 } = useInView({ threshold: 0 });
@@ -28,10 +28,7 @@ const ScrollableLayout: NextPage = () => {
   if (!innerHeight) return null;
 
   return (
-    <div
-      style={{ ...(innerHeight && { height: innerHeight }) }}
-      className={"flex flex-col"}
-    >
+    <div style={{ height: innerHeight }} className={'flex flex-col'}>
       <div className="bg-pink-400 p-4">Header</div>
       <div className="bg-yellow-200 p-4">Breadcrumb</div>
       <div className="h-full relative">

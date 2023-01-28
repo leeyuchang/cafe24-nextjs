@@ -14,24 +14,22 @@ const isExpired = (date: string) => {
  * @returns
  */
 export async function middleware(request: NextRequest) {
-  const url = request.nextUrl;
+  const auth = request.headers.get('authorization');
 
-  if (url.pathname.endsWith('/login')) {
-    const response = NextResponse.redirect(url.origin + '/login');
-    response.cookies.delete('access_token');
-    return response;
+  console.log('===> auth ', auth);
+
+  if (!auth) {
+    return NextResponse.next();
   }
 
-  const token = request.cookies.get('access_token');
-
-  if (!token) return NextResponse.next();
+  console.log('===> 혹시 여기 또 들어오는가???');
 
   try {
     const { JWT_SECRET } = process.env;
 
     if (!JWT_SECRET) throw Error('NotFound JWT_SECRET');
     const encodedSecretKey = new TextEncoder().encode(JWT_SECRET);
-    const { payload } = await jose.jwtVerify(token, encodedSecretKey);
+    const { payload } = await jose.jwtVerify(auth, encodedSecretKey);
 
     const userId = payload.userId as number;
     const userName = payload.userName as string;
@@ -41,17 +39,11 @@ export async function middleware(request: NextRequest) {
     if (payload.exp! - now < 60 * 60 * 24 * 3.5) {
       newToken = await Token.generate({ userId, userName });
     }
-
-    console.log('===> middleware ', userId);
-    console.log('===> middleware ', userName);
-
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('state', JSON.stringify({ user: { userId, userName } }));
-
-    return NextResponse.next({ request: { headers: requestHeaders } });
   } catch (error) {
-    console.log('===> error ', error);
-    return NextResponse.rewrite(new URL('/login', request.url));
+    return new NextResponse(
+      JSON.stringify({ success: false, message: 'ERR_JWS_INVALID' }),
+      { status: 401, headers: { 'content-type': 'application/json' } },
+    );
   }
 }
 

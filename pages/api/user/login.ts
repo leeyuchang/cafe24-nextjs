@@ -1,13 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-import { NotFoundError } from '@prisma/client/runtime';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from "@prisma/client";
+import { NotFoundError } from "@prisma/client/runtime";
+import { NextApiRequest, NextApiResponse } from "next";
 
-import { Token } from '../../../utils';
+import { Token } from "../../../utils";
+import { log } from "console";
 
-import prisma from '../../../lib/prisma';
+const prisma = new PrismaClient();
 
 export default async function login(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
+  log("===> req.headers.state ", req.headers.state);
+
+  if (req.method === "POST") {
     const { username, password } = req.body;
 
     // username, password가 없으면 에러처리
@@ -30,16 +33,17 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
 
       // 쿠키 생성
       // TODO 쿠키옵션 필요
-      // const cookies: string[] = [];
-      // cookies.push(["access_token", token].join("="));
+      const cookies: string[] = [];
+      cookies.push(["access_token", token].join("="));
 
       // 응답 헤더에 쿠키
-      // res.setHeader("Set-Cookie", cookies.join(";"));
+      res.setHeader("Set-Cookie", cookies.join(";"));
 
       // 응답을 리턴한다.
-
-      return res.status(200).send({ accessToken: token, refreshToken: token });
+      return res.status(200).send(user);
     } catch (error) {
+      console.log("===> error ", error);
+
       // 사용자가 없다면 401에러
       if (error instanceof NotFoundError) {
         return res.status(401).end();

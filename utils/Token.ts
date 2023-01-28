@@ -17,7 +17,7 @@ export default class Token {
     return await new jose.SignJWT({ userId, userName })
       .setProtectedHeader({ typ: "JWT", alg: "HS256" })
       .setIssuedAt()
-      .setExpirationTime("1d")
+      .setExpirationTime("5s")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET));
   }
 }

@@ -1,26 +1,29 @@
-import { PrismaClient } from '@prisma/client';
 import { NotFoundError } from '@prisma/client/runtime';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { Token } from '../../../utils';
-
 import prisma from '../../../lib/prisma';
 
-export default async function login(req: NextApiRequest, res: NextApiResponse) {
+export default async function refresh(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method === 'POST') {
-    const { username, password } = req.body;
+    const { username } = req.body;
 
     // username, password가 없으면 에러처리
-    if (!username || !password) {
-      return res.status(401).end();
-    }
+    // if (!username || !password) {
+    //   return res.status(401).end();
+    // }
 
     try {
       // 사용자 정보를 찾는다.
-      const user = await prisma.user.findFirstOrThrow({
-        where: { username },
-        select: { id: true, username: true },
-      });
+      // const user = await prisma.user.findFirstOrThrow({
+      //   where: { username },
+      //   select: { id: true, username: true },
+      // });
+
+      const user = await prisma.user.findFirstOrThrow({ where: { username } });
 
       // 사용자 정보로 토큰을 만든다.
       const token = await Token.generate({
@@ -38,7 +41,9 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
 
       // 응답을 리턴한다.
 
-      return res.status(200).send({ accessToken: token, refreshToken: token });
+      return res
+        .status(200)
+        .send({ accessToken: token, refreshToken: token });
     } catch (error) {
       // 사용자가 없다면 401에러
       if (error instanceof NotFoundError) {
