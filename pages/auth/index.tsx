@@ -1,15 +1,17 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getServerSession } from 'next-auth';
+import { getServerSession, Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Auth(
   session: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
-  if (Object.keys(session).length) {
+
+  if (session?.user?.name) {
     return (
       <>
         Signed in as {session.user.name} <br />
+        Role as a {session.user.role} <br />
         <button onClick={() => signOut()}>Sign out</button>
       </>
     );
@@ -43,7 +45,13 @@ export default function Auth(
 }
 
 type ServerSideRetrun = {
-  user: { address: string; email: string; image: string; name: string };
+  user: {
+    address: string | undefined;
+    email: string | undefined;
+    image: string | undefined;
+    name: string | undefined;
+    role: string | undefined;
+  };
   expires: string;
 };
 
@@ -51,8 +59,9 @@ export const getServerSideProps: GetServerSideProps<ServerSideRetrun> = async ({
   req,
   res,
 }) => {
-  const result = await getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions);
+
   return {
-    props: { ...result } as ServerSideRetrun,
+    props: { ...session } as ServerSideRetrun,
   };
 };

@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import NextAuth, { Session } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '../../../lib/prisma';
@@ -6,11 +7,14 @@ export const authOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
-      // id: new Date().toISOString(),
-      name: '이거뭐지',
+      name: '로그인',
       credentials: {
-        // email: { label: 'Email', type: 'text', placeholder: 'leeyucha@gmail.com' },
-        // password: { label: 'Password', type: 'password' },
+        email: {
+          label: 'Email',
+          type: 'text',
+          placeholder: 'leeyucha@gmail.com',
+        },
+        password: { label: 'Password', type: 'password' },
       },
       // @ts-ignore
       async authorize(credentials) {
@@ -37,8 +41,20 @@ export const authOptions = {
   ],
   callbacks: {
     // 세션 정보를 수정 할 수 있다.
-    session({ session }: { session: Session }) {
-      session.user.address = '성남시 수정구 태평';
+    // session({ session, user }: { session: Session; user: User }) {
+    // session({ session }: { session: Session }) {
+    async session({ session }: { session: Session }) {
+      const { user } = session;
+      if (user?.email) {
+        const found = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (found?.role) {
+          session.user.id = found.id;
+          session.user.role = found.role;
+        }
+      }
       return session;
     },
   },
