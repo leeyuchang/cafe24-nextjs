@@ -1,18 +1,15 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getServerSession } from 'next-auth';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { authOptions } from '../api/auth/[...nextauth]';
 
-export default function Auth(session: any) {
-  // const [refresh, setRefresh] = useState(false);
-  const { data } = useSession();
-
-  console.log("data ", data?.user.address)
-
-  if (Object.keys(session).length || data) {
+export default function Auth(
+  session: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
+  if (Object.keys(session).length) {
     return (
       <>
-        Signed in as {session.user?.email} <br />
+        Signed in as {session.user.name} <br />
         <button onClick={() => signOut()}>Sign out</button>
       </>
     );
@@ -25,7 +22,7 @@ export default function Auth(session: any) {
         onSubmit={async (e) => {
           e.preventDefault();
           await signIn('credentials', {
-            redirect: false,
+            // redirect: false,
             email: e.currentTarget.email.value,
             password: e.currentTarget.password.value,
           });
@@ -45,9 +42,17 @@ export default function Auth(session: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+type ServerSideRetrun = {
+  user: { address: string; email: string; image: string; name: string };
+  expires: string;
+};
+
+export const getServerSideProps: GetServerSideProps<ServerSideRetrun> = async ({
+  req,
+  res,
+}) => {
   const result = await getServerSession(req, res, authOptions);
   return {
-    props: { ...result },
+    props: { ...result } as ServerSideRetrun,
   };
 };

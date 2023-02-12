@@ -6,7 +6,12 @@ export const authOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
-      credentials: {},
+      // id: new Date().toISOString(),
+      name: '이거뭐지',
+      credentials: {
+        // email: { label: 'Email', type: 'text', placeholder: 'leeyucha@gmail.com' },
+        // password: { label: 'Password', type: 'password' },
+      },
       // @ts-ignore
       async authorize(credentials) {
         const { email, password } = credentials as {
@@ -26,7 +31,6 @@ export const authOptions = {
 
         return user;
       },
-      name: '이거뭐지',
       type: 'credentials',
     }),
     // ...add more providers here
@@ -34,11 +38,7 @@ export const authOptions = {
   callbacks: {
     // 세션 정보를 수정 할 수 있다.
     session({ session }: { session: Session }) {
-      // session.user.username = session.user.name
-      //   .split(' ')
-      //   .join('-')
-      //   .toLocaleLowerCase();
-      session.user.address = '경기도 성남시 수정구 태평3동';
+      session.user.address = '성남시 수정구 태평';
       return session;
     },
   },
