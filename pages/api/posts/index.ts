@@ -1,6 +1,8 @@
-import { Tag } from ".prisma/client";
-import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "../../../db";
+import { Tag } from '.prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from '../../../lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]';
 
 export type Req = {
   title: string;
@@ -10,12 +12,14 @@ export type Req = {
 };
 
 const index = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "POST") {
+  const session = await getServerSession(req, res, authOptions);
+
+  console.log('===> session ', session);
+
+  if (req.method === 'POST') {
     const { title, body, tags } = req.body as Req;
     const state = JSON.parse(String(req.headers.state).valueOf());
-    console.log("===> state ", state);
-
-    // const { user }: any = JSON.parse();
+    console.log('===> state ', state);
 
     try {
       const newPost = await prisma.post.create({
@@ -40,7 +44,7 @@ const index = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  if (req.method === "GET") {
+  if (req.method === 'GET') {
     try {
       const posts = await prisma.post.findMany({
         include: { tags: true, _count: true },

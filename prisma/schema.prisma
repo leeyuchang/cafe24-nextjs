@@ -32,4 +32,8 @@ model User {
   username       String @unique
   hashedPassword String
   Post           Post[]
+  password       String
+  email          String @unique
+  name           String
+  image          String
 }

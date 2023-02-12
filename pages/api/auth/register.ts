@@ -28,10 +28,10 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       if (exists) return res.status(409).end();
 
       // 사용자 저장
-      await prisma.user.create({
-        data: { username, hashedPassword: password },
-        select: { username: true },
-      });
+      // await prisma.user.create({
+      //   data: { username, hashedPassword: password },
+      //   select: { username: true },
+      // });
       return res.status(201).end();
     } catch {
       return res.status(500).end();
