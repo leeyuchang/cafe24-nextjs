@@ -17,7 +17,7 @@ model User {
   name     String
   image    String?
   role     Role      @default(MEMBER)
-  account  Account[]
+  accounts Account[]
 
   @@index([email])
 }

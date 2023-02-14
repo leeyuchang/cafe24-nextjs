@@ -6,11 +6,12 @@ export default async function user(req: NextApiRequest, res: NextApiResponse) {
     try {
       const foundUser = await prisma.user.findUniqueOrThrow({
         where: { id: Number(req.query.id) },
-        include: { account: { include: { bank: true } } },
+        include: { accounts: { include: { bank: true } } },
       });
       return res.status(200).send(foundUser);
     } catch (error) {
-      return res.status(400).send('Not Found Excetion');
+      console.log('===> error ', error);
+      return res.status(400).send('Not Found Excetion????');
     }
   }
   if (req.method === 'POST') {

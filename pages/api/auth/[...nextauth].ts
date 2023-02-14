@@ -29,7 +29,7 @@ export const authOptions = {
 
         const user = await prisma.user.findUnique({ where: { email } });
 
-        if (!user) {
+        if (!user || user.password !== password) {
           throw new Error('Invalid username or password');
         }
 
