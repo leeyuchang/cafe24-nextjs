@@ -49,7 +49,7 @@ export default async function index(req: NextApiRequest, res: NextApiResponse) {
 
       const created = await prisma.account.create({
         data: {
-          bankId: 1,
+          bankId,
           name,
           accountNumber,
           startDate,
@@ -59,7 +59,7 @@ export default async function index(req: NextApiRequest, res: NextApiResponse) {
           totalAmount,
           tax: calcTax({ totalAmount, taxRate }),
           taxRate,
-          userId: 1,
+          userId: session?.user.id!,
         },
       });
 

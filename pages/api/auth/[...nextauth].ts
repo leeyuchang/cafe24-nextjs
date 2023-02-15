@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import NextAuth, { Session } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '../../../lib/prisma';
@@ -8,14 +7,7 @@ export const authOptions = {
   providers: [
     CredentialsProvider({
       name: '로그인',
-      credentials: {
-        email: {
-          label: 'Email',
-          type: 'text',
-          placeholder: 'leeyucha@gmail.com',
-        },
-        password: { label: 'Password', type: 'password' },
-      },
+      credentials: {},
       // @ts-ignore
       async authorize(credentials) {
         const { email, password } = credentials as {

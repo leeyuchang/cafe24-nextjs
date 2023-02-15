@@ -4,6 +4,16 @@ import prisma from '../../../lib/prisma';
 // import { authOptions } from '../auth/[...nextauth]';
 
 export default async function index(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'GET') {
+    try {
+      const found = await prisma.bank.findMany();
+      return res.status(200).send(found);
+    } catch (error) {
+      console.log('===> error ', error);
+      return res.status(500).end();
+    }
+  }
+
   if (req.method === 'POST') {
     // const session = await getServerSession(req, res, authOptions);
 
