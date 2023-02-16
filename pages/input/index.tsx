@@ -16,7 +16,9 @@ export default function Index(
   const [interestRate, setInterestRate] = useState('0.0');
   const [totalAmount, setTotalAmount] = useState(0);
   const [taxRate, setTaxRate] = useState('0.0');
-  const [bankId, setBankId] = useState<number | null>(null);
+  const [bankId, setBankId] = useState<number | null>(
+    props.banks[0].id ?? null,
+  );
 
   return (
     <div className="p-10">
@@ -120,10 +122,11 @@ export default function Index(
               value={(startDate || '').toString().substring(0, 16)}
               onChange={(e) => {
                 if (!e.target['validity'].valid) return;
-                const dt = e.target['value'] + ':00Z';
+                // const dt = e.target['value'] + ':00Z';
+                const dt = e.target['value'];
                 setStartDate(dt);
               }}
-              type="datetime-local"
+              type="date"
               name="startDate"
               id="startDate"
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -142,10 +145,11 @@ export default function Index(
               value={(endDate || '').toString().substring(0, 16)}
               onChange={(e) => {
                 if (!e.target['validity'].valid) return;
-                const dt = e.target['value'] + ':00Z';
+                // const dt = e.target['value'] + ':00Z';
+                const dt = e.target['value'];
                 setEndDate(dt);
               }}
-              type="datetime-local"
+              type="date"
               name="endDate"
               id="endDate"
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
