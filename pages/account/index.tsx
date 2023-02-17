@@ -5,36 +5,21 @@ import client from '../../lib/client';
 import { User } from '../../types/types';
 import { authOptions } from '../api/auth/[...nextauth]';
 
-const projects = [
-  {
-    id: 1,
-    name: 'New Advertising Campaign',
-    hours: '12.0',
-    rate: '$75.00',
-    price: '$900.00',
-  },
-  // More projects...
-];
-
 export default function Index(
-  session: InferGetServerSidePropsType<typeof getServerSideProps>,
+  props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
-  if (!session.data) return;
-
-  const { accounts } = session.data;
-
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold text-gray-900">사용자</h1>
-          <div className='flex gap-3'>
-            <p className="mt-2 text-base text-gray-700">{session.user.name}</p>
+          <div className="flex gap-3">
+            <p className="mt-2 text-base text-gray-700">{props.user.name}</p>
             <button
-              className="border-2 rounded h-10 px-2"
+              className="border-2 rounded h-10 px-2 y-1"
               onClick={() => signOut()}
             >
-              Sign out
+              나가기
             </button>
           </div>
         </div>
@@ -109,7 +94,7 @@ export default function Index(
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white overflow-y-auto">
-                  {accounts.map((account, index) => (
+                  {props.user.accounts?.map((account, index) => (
                     <tr
                       key={account.accountNumber}
                       className="divide-x divide-gray-200"
@@ -142,9 +127,7 @@ export default function Index(
                         {account.taxRate}
                       </td>
                       <td className="whitespace-nowrap py-4 pl-4 pr-4 text-base text-gray-500 sm:pr-6">
-                        {new Intl.NumberFormat().format(
-                          account.totalAmount + 50000,
-                        )}
+                        {new Intl.NumberFormat().format(account.maturityAmount)}
                       </td>
                     </tr>
                   ))}
@@ -159,30 +142,24 @@ export default function Index(
 }
 
 type ServerSideRetrun = {
-  user: {
-    address: string | undefined;
-    email: string | undefined;
-    image: string | undefined;
-    name: string | undefined;
-    role: string | undefined;
-  };
-  expires: string;
-  data: User;
+  user: User;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideRetrun> = async ({
   req,
   res,
 }) => {
-  try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session)
-      return { redirect: { permanent: false, destination: '/auth' } };
+  const session = await getServerSession(req, res, authOptions);
+  if (session) {
     const { data } = await client.get<User>(`/api/user/${session.user.id}`);
-    return { props: { ...session, data } as ServerSideRetrun };
-  } catch (error) {
-    console.log('===> error ', error);
+    return { props: { user: data } };
   }
 
-  return { props: {} as ServerSideRetrun };
+  return {
+    redirect: {
+      permanent: false,
+      destination: '/auth',
+    },
+    props: {},
+  };
 };

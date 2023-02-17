@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getServerSession, Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
@@ -21,7 +22,9 @@ export default function Auth(
                 const response = await signIn('credentials', {
                   redirect: false,
                   email: e.currentTarget.email.value,
-                  password: e.currentTarget.password.value,
+                  password: createHash('sha256')
+                    .update(e.currentTarget.password.value)
+                    .digest('hex'),
                   callbackUrl: `${window.location.origin}/account`,
                 });
 

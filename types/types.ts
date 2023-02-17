@@ -17,6 +17,7 @@ export type Account = {
   tax: number;
   taxRate: string;
   totalAmount: number;
+  maturityAmount: number;
   createdAt: Date;
 };
 

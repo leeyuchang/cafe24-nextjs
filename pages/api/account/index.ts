@@ -1,36 +1,51 @@
+import differenceInMonths from 'date-fns/differenceInMonths';
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../../lib/prisma';
-import { authOptions } from '../auth/[...nextauth]';
-import { getServerSession } from 'next-auth';
 
 const calcTax = ({
-  totalAmount,
+  interest,
   taxRate,
 }: {
-  totalAmount: number;
-  taxRate: string;
+  interest: number;
+  taxRate: number;
 }) => {
-  return totalAmount;
+  const tax = (interest * taxRate) / 100;
+
+  // 원단위 절사
+  // 원단위의 경우 10, 십원단위의 경우 100, 백원단위의 경우 1000, ... 을 이용하면 원단위 절사가 가능하다.
+  const result = Math.floor(tax / 10) * 10;
+
+  return result;
 };
 const calcInterest = ({
   totalAmount,
   interestRate,
+  startDate,
+  endDate,
 }: {
   totalAmount: number;
-  interestRate: string;
+  interestRate: number;
+  startDate: Date;
+  endDate: Date;
 }) => {
-  // return totalAmount * interestRate * 100;
-  return totalAmount;
+  const difference = differenceInMonths(new Date(endDate), new Date(startDate));
+
+  // 이자
+  const totalInterest =
+    Number(totalAmount) * (Number(interestRate) / 100) * (difference / 12);
+
+  // 원단위 절사
+  // 원단위의 경우 10, 십원단위의 경우 100, 백원단위의 경우 1000, ... 을 이용하면 원단위 절사가 가능하다.
+  const result = Math.floor(totalInterest / 10) * 10;
+
+  return result;
 };
 
 export default async function index(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const session = await getServerSession(req, res, authOptions);
-
-    // if (!session?.user.id) throw new Error('');
-
     const {
       bankId,
+      userId,
       name,
       accountNumber,
       startDate,
@@ -40,32 +55,59 @@ export default async function index(req: NextApiRequest, res: NextApiResponse) {
       taxRate,
     } = req.body;
 
-    console.log('===> req.body ', req.body);
-
     try {
-      const foundBank = await prisma.bank.findUnique({ where: { id: bankId } });
+      if (
+        !bankId ||
+        !userId ||
+        !name ||
+        !accountNumber ||
+        !startDate ||
+        !endDate ||
+        !interestRate ||
+        !totalAmount ||
+        !taxRate
+      ) {
+        return res.status(400).send('required param');
+      }
 
-      if (!foundBank) throw new Error();
+      // 이자 구하는 함수
+      const interest = calcInterest({
+        startDate,
+        endDate,
+        interestRate,
+        totalAmount,
+      });
+
+      console.log('===> 이자 ', interest);
+
+      // 세금 구하는 함수
+      const tax = calcTax({ interest, taxRate });
+
+      console.log('===> 세금 ', tax);
+
+      // 만기 금액
+      const maturityAmount = Number(totalAmount) + interest - tax;
 
       const created = await prisma.account.create({
         data: {
           bankId,
+          userId,
           name,
           accountNumber,
           startDate,
           endDate,
-          interest: calcInterest({ totalAmount, interestRate }),
-          interestRate,
-          totalAmount,
-          tax: calcTax({ totalAmount, taxRate }),
+          interest, // 이자금액
+          interestRate, // 이자율
+          totalAmount: Number(totalAmount), // 원금
+          maturityAmount, // 만기금액
+          tax, // 세금
           taxRate,
-          userId: session?.user.id!,
         },
       });
 
       return res.status(201).send(created);
     } catch (error) {
-      console.log('===> error ', error);
+      console.error(error);
       return res.status(500).end();
     }
   }

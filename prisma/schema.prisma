@@ -23,19 +23,20 @@ model User {
 }
 
 model Account {
-  id            Int      @id @default(autoincrement())
-  name          String // 통장명
-  accountNumber String // 계좌번호
-  startDate     DateTime // 개설일
-  endDate       DateTime // 만기일
-  interest      Int      @default(0) // 이자
-  interestRate  String   @default("") // 이자율
-  totalAmount   Int      @default(0) // 총금액
-  tax           Int      @default(0) // 세금
-  taxRate       String   @default("") // 세금율
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int
+  id             Int      @id @default(autoincrement())
+  name           String // 통장명
+  accountNumber  String // 계좌번호
+  startDate      DateTime // 개설일
+  endDate        DateTime // 만기일
+  interest       Int      @default(0) // 이자
+  interestRate   String   @default("") // 이자율
+  totalAmount    Int      @default(0) // 총금액
+  maturityAmount Int      @default(0) // 만기금액
+  tax            Int      @default(0) // 세금
+  taxRate        String   @default("") // 세금율
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
 
   bank   Bank @relation(fields: [bankId], references: [id])
   bankId Int

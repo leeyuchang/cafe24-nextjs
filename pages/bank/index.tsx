@@ -1,4 +1,7 @@
+import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
 import { useState } from 'react';
+import { authOptions } from '../api/auth/[...nextauth]';
 import client from '../api/client';
 
 export default function Index() {
@@ -15,7 +18,7 @@ export default function Index() {
           try {
             await client.post('/api/bank', { name, phone, location });
           } catch (error) {
-            console.log('===> error ', error);
+            console.error(error);
           } finally {
             setName('');
             setPhone('');
@@ -90,3 +93,19 @@ export default function Index() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getServerSession(req, res, authOptions);
+
+  if (session) {
+    return { props: {} };
+  }
+
+  return {
+    redirect: {
+      permanent: false,
+      destination: '/auth',
+    },
+    props: {},
+  };
+};
