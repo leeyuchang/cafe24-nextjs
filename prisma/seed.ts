@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma';
+import { createHash } from 'crypto';
 
 async function main() {
   const SEED_EMAIL = process.env.SEED_EMAIL;
@@ -13,7 +14,7 @@ async function main() {
     data: {
       email: SEED_EMAIL,
       name: SEED_NAME,
-      password: SEED_PASSWORD,
+      password: createHash('sha256').update(SEED_PASSWORD).digest('hex'),
       role: 'ADMIN',
     },
   });
