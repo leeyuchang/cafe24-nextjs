@@ -142,7 +142,7 @@ export default function Index(
                       <td className="whitespace-nowrap p-4 text-base text-gray-500">
                         {account.accountNumber}
                       </td>
-                      <td className="whitespace-nowrap p-4 text-base text-gray-500">
+                      <td className="whitespace-nowrap p-4 text-base text-gray-500 text-right">
                         {new Intl.NumberFormat().format(account.totalAmount)}
                       </td>
                       <td className="whitespace-nowrap p-4 text-base text-gray-500">
@@ -151,7 +151,7 @@ export default function Index(
                       <td className="whitespace-nowrap p-4 text-base text-gray-500">
                         {account.taxRate}
                       </td>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-4 text-base text-gray-500 sm:pr-6">
+                      <td className="whitespace-nowrap py-4 pl-4 pr-4 text-base text-gray-500 sm:pr-6 text-right">
                         {new Intl.NumberFormat().format(account.maturityAmount)}
                       </td>
                     </tr>
