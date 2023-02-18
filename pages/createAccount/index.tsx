@@ -1,13 +1,17 @@
 import { Listbox } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { FormEvent, useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../../lib/client';
 import prisma from '../../lib/prisma';
 
 export default function Index(
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
+  const router = useRouter();
+
   const [name, setName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -38,32 +42,34 @@ export default function Index(
     return true;
   };
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!isValidated()) return;
+
+    try {
+      await client.post('/api/account', {
+        bankId,
+        userId: customerId,
+        name,
+        accountNumber,
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        interestRate,
+        totalAmount,
+        taxRate,
+      });
+      toast.success('성공');
+      setTimeout(() => router.back(), 1_500);
+    } catch (error) {
+      console.error(error);
+      toast.error('실패');
+    }
+  };
+
   return (
     <div className="p-10">
-      <form
-        className="space-y-4"
-        onSubmit={async (e) => {
-          e.preventDefault();
-
-          if (!isValidated()) return;
-          
-          try {
-            await client.post('/api/account', {
-              bankId,
-              userId: customerId,
-              name,
-              accountNumber,
-              startDate: new Date(startDate).toISOString(),
-              endDate: new Date(endDate).toISOString(),
-              interestRate,
-              totalAmount,
-              taxRate,
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        }}
-      >
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <Listbox value={customerId} onChange={setCustomerId}>
           <div className="relative">
             <label className="block text-sm font-bold text-gray-700">

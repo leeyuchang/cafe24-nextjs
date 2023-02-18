@@ -1,22 +1,26 @@
 import { createHash } from 'crypto';
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
+import { useRouter } from 'next/router';
 import { FormEvent, useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../../lib/client';
 import Page from '../../navigation';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Index() {
+  const router = useRouter();
+
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
 
-  async function handleSubmit<T>(e: FormEvent<T>) {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!password || !email || !name || !role) {
-      console.log('===> validate ');
+      toast.info("입력란을 모두 채워주세요.")
       return;
     }
 
@@ -27,10 +31,13 @@ export default function Index() {
         name,
         role,
       });
+      toast.success('성공');
+      setTimeout(() => router.back(), 1_500);
     } catch (error) {
-      console.log('===> error ', error);
+      console.log(error);
+      toast.error('실패');
     }
-  }
+  };
 
   return (
     <div className="p-10">

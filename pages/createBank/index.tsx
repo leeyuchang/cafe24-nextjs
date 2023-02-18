@@ -1,35 +1,34 @@
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { FormEvent, useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../../lib/client';
 import Page from '../../navigation';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Index() {
+  const router = useRouter();
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
 
-  const handleClear = () => {
-    setName('');
-    setPhone('');
-    setLocation('');
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await client.post('/api/bank', { name, phone, location });
+      toast.success('성공');
+      setTimeout(() => router.back(), 1_500);
+    } catch (error) {
+      console.error(error);
+      toast.error('실패');
+    }
   };
 
   return (
     <div className="p-10">
-      <form
-        className="space-y-4"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          try {
-            await client.post('/api/bank', { name, phone, location });
-            handleClear();
-          } catch (error) {
-            console.error(error);
-          }
-        }}
-      >
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label
             htmlFor="name"

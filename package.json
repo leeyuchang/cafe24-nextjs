@@ -31,6 +31,7 @@
     "react-intersection-observer": "^9.4.1",
     "react-popper": "^2.3.0",
     "react-to-print": "^2.14.11",
+    "react-toastify": "^9.1.1",
     "react-use": "^17.4.0",
     "xlsx": "^0.18.5"
   },
