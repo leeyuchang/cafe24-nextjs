@@ -1,13 +1,19 @@
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { useState } from 'react';
+import client from '../../lib/client';
 import { authOptions } from '../api/auth/[...nextauth]';
-import client from '../api/client';
 
 export default function Index() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
+
+  const handleClear = () => {
+    setName('');
+    setPhone('');
+    setLocation('');
+  };
 
   return (
     <div className="p-10">
@@ -17,12 +23,9 @@ export default function Index() {
           e.preventDefault();
           try {
             await client.post('/api/bank', { name, phone, location });
+            handleClear();
           } catch (error) {
             console.error(error);
-          } finally {
-            setName('');
-            setPhone('');
-            setLocation('');
           }
         }}
       >
