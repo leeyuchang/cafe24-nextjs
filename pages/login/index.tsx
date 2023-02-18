@@ -3,6 +3,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getServerSession, Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import Page from '../../navigation';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Auth(
@@ -25,7 +26,7 @@ export default function Auth(
                   password: createHash('sha256')
                     .update(e.currentTarget.password.value)
                     .digest('hex'),
-                  callbackUrl: `${window.location.origin}/account`,
+                  callbackUrl: `${window.location.origin}${Page.readAccounts}`,
                 });
 
                 if (response && response.ok && response.url) {

@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { useState } from 'react';
 import client from '../../lib/client';
+import Page from '../../navigation';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Index() {
@@ -107,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     redirect: {
       permanent: false,
-      destination: '/auth',
+      destination: Page.login,
     },
     props: {},
   };

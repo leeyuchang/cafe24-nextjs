@@ -1,13 +1,38 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getServerSession } from 'next-auth';
 import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 import client from '../../lib/client';
+import Page from '../../navigation';
 import { User } from '../../types/types';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 export default function Index(
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
+  if (props.user.role === 'ADMIN') {
+    return (
+      <div className='flex items-center justify-center h-screen w-screen'>
+        <div className="flex flex-col gap-5 font-semibold">
+          <div>
+            <Link href={Page.createCustomer}>사용자 생성</Link>
+          </div>
+          <div>
+            <Link href={Page.createBank}>은행 생성</Link>
+          </div>
+          <div>
+            <Link href={Page.createAccount}>계좌 생성</Link>
+          </div>
+          <button
+            className="border-2 rounded h-10 px-2 y-1"
+            onClick={() => signOut()}
+          >
+            나가기
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -158,7 +183,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideRetrun> = async ({
   return {
     redirect: {
       permanent: false,
-      destination: '/auth',
+      destination: Page.login,
     },
     props: {},
   };

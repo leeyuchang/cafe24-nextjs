@@ -1,5 +1,15 @@
-import ScrollableLayout from './ScrollableLayout';
+import Page from '../navigation';
 
 export default function Home(props: any) {
-  return <ScrollableLayout />;
+  return <></>;
 }
+
+export const getServerSideProps = () => {
+  return {
+    redirect: {
+      permanent: false,
+      destination: Page.login,
+    },
+    props: {},
+  };
+};
